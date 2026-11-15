@@ -100,3 +100,42 @@ CREATE TABLE DecorationStyles (
 
 
 
+-- ==========================================
+-- 9. «·√’Ê· Ê«· ÃÂÌ“«  (Assets)
+-- ==========================================
+CREATE TABLE Assets (
+    AssetID INT IDENTITY(1,1) PRIMARY KEY,      -- «·„› «Õ «·√”«”Ì ··√’·
+    AssetName NVARCHAR(100) NOT NULL,           -- «”„ «·√’· (ﬂ—«”Ì° ÿ«Ê·« ° „›«—‘° „œ«ﬂÌ...)
+    TotalQuantity INT NOT NULL,                 -- «·ﬂ„Ì… «·ﬂ·Ì… «·„ «Õ… ›Ì „” Êœ⁄ «·ﬁ«⁄…
+    Notes NVARCHAR(MAX) NULL,                   -- „·«ÕŸ«  ÕÊ· Õ«·… «·„Œ“Ê‰
+    CONSTRAINT CHK_Assets_TotalQuantity CHECK (TotalQuantity >= 0)
+);
+
+-- ==========================================
+-- 10. «·Œœ„«  «·≈÷«›Ì… (Services)
+-- ==========================================
+CREATE TABLE Services (
+    ServiceID INT IDENTITY(1,1) PRIMARY KEY,    -- «·„› «Õ «·√”«”Ì ··Œœ„…
+    ServiceName NVARCHAR(100) NOT NULL,         -- «”„ «·Œœ„… (œÌ ÃÌ° ÷Ì«›…°  ’ÊÌ—...)
+    DefaultPrice DECIMAL(18,2) NOT NULL,        -- «·”⁄— «·«› —«÷Ì «·„⁄ „œ
+    IsAvailable BIT NOT NULL DEFAULT 1,         -- Â· «·Œœ„… „ «Õ… ··ÿ·» Õ«·Ì«ø
+    CONSTRAINT CHK_Services_DefaultPrice CHECK (DefaultPrice >= 0)
+);
+
+-- ==========================================
+-- 11. √‰Ê«⁄ «·œ›⁄«  «·„«·Ì… (PaymentTypes)
+-- ==========================================
+CREATE TABLE PaymentTypes (
+    PaymentTypeID INT IDENTITY(1,1) PRIMARY KEY, -- «·„› «Õ «·√”«”Ì
+    PaymentTypeName NVARCHAR(50) NOT NULL UNIQUE, -- «”„ «·‰Ê⁄ (⁄—»Ê‰° œ›⁄… ÕÃ“°  ”ÊÌ…  ·›Ì« ...)
+    Description NVARCHAR(255) NULL              -- ‘—Õ  ›’Ì·Ì
+);
+
+-- ==========================================
+-- 12. ÿ—ﬁ «·œ›⁄ (PaymentMethods)
+-- ==========================================
+CREATE TABLE PaymentMethods (
+    PaymentMethodID INT IDENTITY(1,1) PRIMARY KEY, -- «·„› «Õ «·√”«”Ì
+    PaymentMethodName NVARCHAR(50) NOT NULL UNIQUE, -- «”„ «·ÿ—Ìﬁ… (‰ﬁœ« ﬂ«‘°  ÕÊÌ· »‰ﬂÌ...)
+    Description NVARCHAR(255) NULL              -- „·«ÕŸ« 
+);
