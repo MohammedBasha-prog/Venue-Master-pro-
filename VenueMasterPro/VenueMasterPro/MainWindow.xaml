@@ -1,0 +1,121 @@
+﻿<Window x:Class="VenueMasterPro.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:VenueMasterPro"
+        mc:Ignorable="d"
+        Title="تسجيل الدخول - Venue Master Pro" 
+        Height="550" Width="420"
+        WindowStartupLocation="CenterScreen"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        FlowDirection="RightToLeft">
+
+    <Window.Resources>
+        <!-- تأثير ظل فخم للبطاقة -->
+        <DropShadowEffect x:Key="CardShadow" BlurRadius="35" ShadowDepth="8" Direction="270" Opacity="0.25"/>
+    </Window.Resources>
+
+    <!-- الحاوية الرئيسية الشفافة -->
+    <Grid Background="Transparent" Margin="15">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="362*"/>
+            <RowDefinition Height="159*"/>
+        </Grid.RowDefinitions>
+
+        <!-- البطاقة الرئيسية بإطار مميز ومتناسق -->
+        <Border Background="#FFFFFFFF" 
+                BorderBrush="#FF3B82F6" 
+                BorderThickness="1.5"
+                CornerRadius="20" 
+                Effect="{StaticResource CardShadow}"
+                Padding="30,22" Grid.RowSpan="2">
+
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <!-- زر الإغلاق -->
+                    <RowDefinition Height="Auto"/>
+                    <!-- أيقونة النظام -->
+                    <RowDefinition Height="Auto"/>
+                    <!-- العنوان والترحيب -->
+                    <RowDefinition Height="Auto"/>
+                    <!-- حقول الإدخال -->
+                    <RowDefinition Height="Auto"/>
+                    <!-- تذكرني -->
+                    <RowDefinition Height="Auto"/>
+                    <!-- زر الدخول -->
+                </Grid.RowDefinitions>
+
+                <!-- 1. زر إغلاق النافذة (✕) -->
+                <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,0,2">
+                    <Button x:Name="btnClose" Content="✕" Width="28" Height="28" 
+                            Background="Transparent" Foreground="#FF64748B" BorderBrush="Transparent"
+                            FontSize="14" FontWeight="Bold" Cursor="Hand" Click="BtnClose_Click"/>
+                </StackPanel>
+
+                <!-- 2. أيقونة النظام -->
+                <Border Grid.Row="1" Width="52" Height="52" CornerRadius="26" Background="#FFE0F2FE" HorizontalAlignment="Center" Margin="0,0,0,8">
+                    <TextBlock Text="🏛️" FontSize="22" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Border>
+
+                <!-- 3. العنوان والترحيب -->
+                <StackPanel Grid.Row="2" HorizontalAlignment="Center" Margin="0,0,0,15">
+                    <TextBlock Text="Venue Master Pro" FontSize="18" FontWeight="Bold" Foreground="#FF1E3A8A" HorizontalAlignment="Center"/>
+                    <TextBlock Text="مرحباً بك مجدداً، يرجى تسجيل الدخول" FontSize="11" Foreground="#FF64748B" HorizontalAlignment="Center" Margin="0,3,0,0"/>
+                </StackPanel>
+
+                <!-- 4. حقول الإدخال -->
+                <StackPanel Grid.Row="3" Margin="0,0,0,10">
+                    <!-- اسم المستخدم -->
+                    <TextBlock Text="اسم المستخدم" FontSize="11" FontWeight="SemiBold" Foreground="#FF334155" Margin="0,0,0,4"/>
+                    <Border BorderBrush="#FFCBD5E1" BorderThickness="1" CornerRadius="8" Background="#FFF8FAFC" Height="38" Padding="10,0" Margin="0,0,0,10">
+                        <TextBox x:Name="txtUsername" BorderThickness="0" Background="Transparent" VerticalContentAlignment="Center" FontSize="12" Foreground="#FF0F172A"/>
+                    </Border>
+
+                    <!-- كلمة المرور مع زر إظهار/إخفاء -->
+                    <TextBlock Text="كلمة المرور" FontSize="11" FontWeight="SemiBold" Foreground="#FF334155" Margin="0,0,0,4"/>
+                    <Border BorderBrush="#FFCBD5E1" BorderThickness="1" CornerRadius="8" Background="#FFF8FAFC" Height="38" Padding="10,0">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <!-- صندوق كلمة المرور المشفرة -->
+                            <PasswordBox x:Name="txtPassword" Grid.Column="0" BorderThickness="0" Background="Transparent" VerticalContentAlignment="Center" FontSize="12" Foreground="#FF0F172A"/>
+
+                            <!-- صندوق نص مرئي (يظهر عند الضغط على العين) -->
+                            <TextBox x:Name="txtVisiblePassword" Grid.Column="0" BorderThickness="0" Background="Transparent" VerticalContentAlignment="Center" FontSize="12" Foreground="#FF0F172A" Visibility="Collapsed"/>
+
+                            <!-- زر العين لإظهار وإخفاء كلمة المرور -->
+                            <Button x:Name="btnShowPassword" Grid.Column="1" Content="👁" Width="30" Height="28" 
+                                    Background="Transparent" BorderBrush="Transparent" Foreground="#FF64748B"
+                                    Cursor="Hand" Click="BtnShowPassword_Click" ToolTip="إظهار / إخفاء كلمة المرور"/>
+                        </Grid>
+                    </Border>
+                </StackPanel>
+
+                <!-- 5. خيار تذكرني -->
+                <CheckBox x:Name="chkRememberMe" Grid.Row="4" Content="تذكرني في المرة القادمة" FontSize="11" Foreground="#FF475569" Margin="0,0,0,15" VerticalAlignment="Center"/>
+
+                <!-- 6. زر تسجيل الدخول -->
+                <Button Grid.Row="5" Content="تسجيل الدخول" 
+                        Background="#FF1E3A8A" Foreground="White" 
+                        FontSize="13" FontWeight="SemiBold" Height="42" 
+                        Cursor="Hand" Click="BtnLogin_Click">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Border Background="{TemplateBinding Background}" CornerRadius="8">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
+
+            </Grid>
+        </Border>
+    </Grid>
+</Window>
