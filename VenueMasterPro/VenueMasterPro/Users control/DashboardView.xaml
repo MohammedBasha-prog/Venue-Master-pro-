@@ -1,0 +1,125 @@
+﻿<UserControl x:Class="VenueMasterPro.DashboardView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:VenueMasterPro"
+             mc:Ignorable="d" 
+             d:DesignHeight="600" d:DesignWidth="950"
+             FlowDirection="RightToLeft">
+
+    <Grid Background="Transparent">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <!-- العنوان الرئيسي والترحيب -->
+            <RowDefinition Height="Auto"/>
+            <!-- البطاقات الإحصائية (3 بطاقات تفصيلية) -->
+            <RowDefinition Height="*"/>
+            <!-- الجدول المصغر لأحدث الحجوزات -->
+        </Grid.RowDefinitions>
+
+        <!-- 1. عنوان الصفحة -->
+        <StackPanel Grid.Row="0" Margin="0,0,0,20">
+            <TextBlock Text="لوحة الإحصائيات العامة" FontSize="20" FontWeight="Bold" Foreground="White"/>
+            <TextBlock Text="نظرة سريعة على أداء الحجوزات، العربونات، والدخل المالي اليوم." FontSize="12" Foreground="#FF94A3B8" Margin="0,5,0,0"/>
+        </StackPanel>
+
+        <!-- 2. البطاقات الإحصائية الملونة (Cards) - أصبحت 3 بطاقات متناسقة -->
+        <UniformGrid Grid.Row="1" Columns="3" Margin="0,0,0,20">
+
+            <!-- بطاقة 1: عدد الحجوزات التي تمت اليوم -->
+            <Border Background="#FF1E293B" CornerRadius="12" Padding="20" Margin="0,0,10,0" BorderBrush="#FF3B82F6" BorderThickness="0,0,0,3">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                        <TextBlock Text="إجمالي حجوزات اليوم" FontSize="12" Foreground="#FF94A3B8"/>
+                        <TextBlock Text="18" FontSize="26" FontWeight="Bold" Foreground="White" Margin="0,5,0,0"/>
+                        <TextBlock Text="↗︎ +12% عن أمس" FontSize="11" Foreground="#FF34D399" Margin="0,3,0,0"/>
+                    </StackPanel>
+                    <Border Grid.Column="1" Width="45" Height="45" CornerRadius="10" Background="#1A3B82F6" VerticalAlignment="Center">
+                        <TextBlock Text="📅" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                </Grid>
+            </Border>
+
+            <!-- بطاقة 2: إجمالي العربونات المستلمة اليوم -->
+            <Border Background="#FF1E293B" CornerRadius="12" Padding="20" Margin="5,0,5,0" BorderBrush="#FF10B981" BorderThickness="0,0,0,3">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                        <TextBlock Text="إجمالي العربونات (مقدم الحجز)" FontSize="12" Foreground="#FF94A3B8"/>
+                        <TextBlock Text="$950" FontSize="26" FontWeight="Bold" Foreground="White" Margin="0,5,0,0"/>
+                        <TextBlock Text="• مبالغ مؤكدة" FontSize="11" Foreground="#FF10B981" Margin="0,3,0,0"/>
+                    </StackPanel>
+                    <Border Grid.Column="1" Width="45" Height="45" CornerRadius="10" Background="#1A10B981" VerticalAlignment="Center">
+                        <TextBlock Text="💵" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                </Grid>
+            </Border>
+
+            <!-- بطاقة 3: المبالغ المدفوعة لإكمال الحجوزات -->
+            <Border Background="#FF1E293B" CornerRadius="12" Padding="20" Margin="10,0,0,0" BorderBrush="#FF8B5CF6" BorderThickness="0,0,0,3">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                        <TextBlock Text="مبالغ إكمال الحجوزات" FontSize="12" Foreground="#FF94A3B8"/>
+                        <TextBlock Text="$1,500" FontSize="26" FontWeight="Bold" Foreground="White" Margin="0,5,0,0"/>
+                        <TextBlock Text="• تسويات وتدفيعات نهائية" FontSize="11" Foreground="#FF8B5CF6" Margin="0,3,0,0"/>
+                    </StackPanel>
+                    <Border Grid.Column="1" Width="45" Height="45" CornerRadius="10" Background="#1A8B5CF6" VerticalAlignment="Center">
+                        <TextBlock Text="💰" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                </Grid>
+            </Border>
+
+        </UniformGrid>
+
+        <!-- 3. الجدول المصغر لأحدث الحجوزات (مع خطوط واضحة وخط أسود) -->
+        <Border Grid.Row="2" Background="#FF1E293B" CornerRadius="12" Padding="20">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- عنوان الجدول -->
+                <TextBlock Grid.Row="0" Text="أحدث الحجوزات المسجلة" FontSize="15" FontWeight="Bold" Foreground="White" Margin="0,0,0,15"/>
+
+                <!-- جدول البيانات (DataGrid) -->
+                <DataGrid Grid.Row="1" AutoGenerateColumns="False" CanUserAddRows="False" 
+                          Background="White" BorderBrush="#FF334155" RowBackground="White" 
+                          AlternatingRowBackground="#FFF1F5F9" Foreground="Black" GridLinesVisibility="Horizontal"
+                          HorizontalGridLinesBrush="#FFCBD5E1" HeadersVisibility="Column">
+
+                    <!-- تخصيص رأس الجدول ليكون داكناً وواضحاً -->
+                    <DataGrid.ColumnHeaderStyle>
+                        <Style TargetType="DataGridColumnHeader">
+                            <Setter Property="Background" Value="#FF0F172A"/>
+                            <Setter Property="Foreground" Value="White"/>
+                            <Setter Property="FontWeight" Value="Bold"/>
+                            <Setter Property="Padding" Value="10,8"/>
+                        </Style>
+                    </DataGrid.ColumnHeaderStyle>
+
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="رقم الحجز" Binding="{Binding ID}" Width="90"/>
+                        <DataGridTextColumn Header="اسم العميل" Binding="{Binding CustomerName}" Width="*"/>
+                        <DataGridTextColumn Header="القاعة" Binding="{Binding VenueName}" Width="130"/>
+                        <DataGridTextColumn Header="الوقت والتاريخ" Binding="{Binding Date}" Width="140"/>
+                        <DataGridTextColumn Header="الحالة" Binding="{Binding Status}" Width="100"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Grid>
+        </Border>
+
+    </Grid>
+</UserControl>

@@ -53,6 +53,11 @@ namespace VenueMasterPro
             }
 
             MessageBox.Show($"مرحباً بك: {username}", "تسجيل الدخول", MessageBoxButton.OK, MessageBoxImage.Information);
+            // 2. إنشاء كائن من الصفحة الرئيسية
+            MainDashboard dashboard = new MainDashboard();
+
+            // 3. إظهار الصفحة الرئيسية
+            dashboard.Show();
         }
     }
 }
