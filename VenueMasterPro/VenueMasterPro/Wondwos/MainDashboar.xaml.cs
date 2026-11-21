@@ -1,95 +1,5 @@
-﻿//using System.Windows;
-//using System.Windows.Input;
-
-//namespace VenueMasterPro
-//{
-//    public partial class MainDashboard : Window
-//    {
-//        // متغير وهمي لتحديد الصلاحيات (يمكن ربطه بقاعدة البيانات لاحقاً)
-//        // إذا كان true سيظهر خيار "إضافة حساب"، وإذا كان false سيختفي
-//        private bool isAdmin = true;
-//        private bool isAccountMenuOpen = false;
-
-//        public MainDashboard()
-//        {
-//            InitializeComponent();
-//            CheckUserRole();
-//        }
-
-//        // فحص صلاحيات المستخدم وإخفاء/إظهار زر إضافة حساب
-//        private void CheckUserRole()
-//        {
-//            if (isAdmin)
-//            {
-//                btnAddAccount.Visibility = Visibility.Visible;
-//            }
-//            else
-//            {
-//                btnAddAccount.Visibility = Visibility.Collapsed;
-//            }
-//        }
-
-//        // زر فتح وإغلاق قائمة الحسابات المنسدلة
-//        private void BtnAccountMenu_Click(object sender, RoutedEventArgs e)
-//        {
-//            if (isAccountMenuOpen)
-//            {
-//                pnlAccountSubMenu.Visibility = Visibility.Collapsed;
-//                isAccountMenuOpen = false;
-//            }
-//            else
-//            {
-//                pnlAccountSubMenu.Visibility = Visibility.Visible;
-//                isAccountMenuOpen = true;
-//            }
-//        }
-
-//        // حدث إضافة حساب جديد (خاص بالمدير)
-//        private void BtnAddAccount_Click(object sender, RoutedEventArgs e)
-//        {
-//            MessageBox.Show("فتح شاشة إضافة حساب جديد...", "إدارة الحسابات", MessageBoxButton.OK, MessageBoxImage.Information);
-//        }
-
-//        // حدث تعديل الحساب الحالي
-//        private void BtnEditAccount_Click(object sender, RoutedEventArgs e)
-//        {
-//            MessageBox.Show("فتح شاشة تعديل بيانات الحساب...", "إدارة الحسابات", MessageBoxButton.OK, MessageBoxImage.Information);
-//        }
-
-//        // زر تحريك النافذة
-//        private void HeaderGrid_MouseDown(object sender, MouseButtonEventArgs e)
-//        {
-//            if (e.LeftButton == MouseButtonState.Pressed)
-//            {
-//                DragMove();
-//            }
-//        }
-
-//        // زر تصغير النافذة
-//        private void BtnMinimize_Click(object sender, RoutedEventArgs e)
-//        {
-//            WindowState = WindowState.Minimized;
-//        }
-
-//        // زر إغلاق التطبيق
-//        private void BtnClose_Click(object sender, RoutedEventArgs e)
-//        {
-//            Application.Current.Shutdown();
-//        }
-
-//        // زر تسجيل الخروج (يعيد فتح شاشة تسجيل الدخول)
-//        private void BtnLogout_Click(object sender, RoutedEventArgs e)
-//        {
-//            MainWindow loginWindow = new MainWindow();
-//            loginWindow.Show();
-//            this.Close();
-//        }
-//    }
-//}
-
-
-
-using System.Windows;
+﻿using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 
@@ -98,80 +8,129 @@ namespace VenueMasterPro
     public partial class MainDashboard : Window
     {
         private bool isAdmin = true;
-        private bool isAccountMenuOpen = false;
+        private Button _currentActiveButton = null;
 
         public MainDashboard()
         {
             InitializeComponent();
             CheckUserRole();
-
-            // 1. جعل لوحة التحكم تفتح تلقائياً فور تشغيل النظام
             LoadDefaultDashboard();
         }
 
         private void LoadDefaultDashboard()
         {
-            // عرض UserControl الخاص بلوحة التحكم في مساحة العرض الرئيسية
             MainContentArea.Content = new DashboardView();
-
-            // تحديد زر لوحة التحكم بصرياً كزر مفعل حالياً (Active)
             HighlightActiveButton(btnDashboard);
         }
 
-        // دالة لتغيير لون الزر النشط ليعلم المستخدم أنه في هذه الصفحة
-        private System.Windows.Controls.Button currentActiveButton = null;
-        private void HighlightActiveButton(System.Windows.Controls.Button clickedButton)
+        private void HighlightActiveButton(Button clickedButton)
         {
-            // إعادة الزر السابق إلى وضعه العادي إن وجد
-            if (currentActiveButton != null)
+            var brushConverter = new BrushConverter();
+
+            if (_currentActiveButton != null)
             {
-                currentActiveButton.Background = Brushes.Transparent;
-                currentActiveButton.Foreground = (Brush)new BrushConverter().ConvertFrom("#FF94A3B8");
+                _currentActiveButton.ClearValue(BackgroundProperty);
+                _currentActiveButton.ClearValue(ForegroundProperty);
             }
 
-            // تمييز الزر الحالي
-            currentActiveButton = clickedButton;
-            if (currentActiveButton != null)
+            _currentActiveButton = clickedButton;
+            if (_currentActiveButton != null)
             {
-                currentActiveButton.Background = (Brush)new BrushConverter().ConvertFrom("#FF1E293B");
-                currentActiveButton.Foreground = Brushes.White;
+                _currentActiveButton.Background = (Brush)brushConverter.ConvertFrom("#FFDBEAFE");
+                _currentActiveButton.Foreground = (Brush)brushConverter.ConvertFrom("#FF1E3A8A");
             }
         }
 
-        // عند الضغط على زر "لوحة التحكم" من القائمة الجانبية
+        private void btnDashboard_Click_1(object sender, RoutedEventArgs e)
+        {
+            BtnDashboard_Click(sender, e);
+        }
+
         private void BtnDashboard_Click(object sender, RoutedEventArgs e)
         {
             MainContentArea.Content = new DashboardView();
-            HighlightActiveButton(sender as System.Windows.Controls.Button);
+            HighlightActiveButton(btnDashboard);
         }
 
-        // عند الضغط على زر "إدارة الحجوزات"
         private void BtnReservations_Click(object sender, RoutedEventArgs e)
         {
-            // MainContentArea.Content = new ReservationsView(); // ضع صفحة الحجوزات لاحقاً هنا
-            HighlightActiveButton(sender as System.Windows.Controls.Button);
+            // MainContentArea.Content = new ReservationsView();
+            HighlightActiveButton(sender as Button);
         }
 
-        // ... وباقي أحداث الأزرار بنفس الطريقة ...
+        private void BtnSettingsMenu_Click(object sender, RoutedEventArgs e)
+        {
+            if (pnlSettingsSubMenu.Visibility == Visibility.Collapsed)
+            {
+                pnlSettingsSubMenu.Visibility = Visibility.Visible;
+                txtSettingsArrow.Text = "▲";
+            }
+            else
+            {
+                pnlSettingsSubMenu.Visibility = Visibility.Collapsed;
+                txtSettingsArrow.Text = "▼";
+            }
+        }
 
-        // دالة فتح وإغلاق قائمة الحسابات
         private void BtnAccountMenu_Click(object sender, RoutedEventArgs e)
         {
-            pnlAccountSubMenu.Visibility = (pnlAccountSubMenu.Visibility == Visibility.Visible) ? Visibility.Collapsed : Visibility.Visible;
-            //isAccountMenuOpen = !isAccountMenuOpen;
+            if (pnlAccountSubMenu.Visibility == Visibility.Collapsed)
+            {
+                pnlAccountSubMenu.Visibility = Visibility.Visible;
+                txtArrow.Text = "▲";
+            }
+            else
+            {
+                pnlAccountSubMenu.Visibility = Visibility.Collapsed;
+                txtArrow.Text = "▼";
+            }
         }
 
         private void CheckUserRole()
         {
-            if (btnAddAccount != null)
-                btnAddAccount.Visibility = isAdmin ? Visibility.Visible : Visibility.Collapsed;
+            if (btnAddUser != null)
+                btnAddUser.Visibility = isAdmin ? Visibility.Visible : Visibility.Collapsed;
         }
 
-        private void BtnAddAccount_Click(object sender, RoutedEventArgs e) => MessageBox.Show("إضافة حساب جديد");
-        private void BtnEditAccount_Click(object sender, RoutedEventArgs e) => MessageBox.Show("تعديل الحساب");
-        private void HeaderGrid_MouseDown(object sender, MouseButtonEventArgs e) { if (e.LeftButton == MouseButtonState.Pressed) DragMove(); }
-        private void BtnMinimize_Click(object sender, RoutedEventArgs e) => WindowState = WindowState.Minimized;
-        private void BtnClose_Click(object sender, RoutedEventArgs e) => Application.Current.Shutdown();
-        private void BtnLogout_Click(object sender, RoutedEventArgs e) { new MainWindow().Show(); this.Close(); }
+        private void BtnPermissions_Click(object sender, RoutedEventArgs e)
+        {
+            MainContentArea.Content = new ucPermissionsManagement();
+            HighlightActiveButton(btnPermissions);
+        }
+
+        private void BtnRoles_Click(object sender, RoutedEventArgs e)
+        {
+            MainContentArea.Content = new ucRolesManagement();
+            HighlightActiveButton(btnRoles);
+        }
+
+        private void BtnAddAccount_Click(object sender, RoutedEventArgs e)
+            => MessageBox.Show("فتح شاشة إضافة مستخدم جديد...", "إعدادات النظام", MessageBoxButton.OK, MessageBoxImage.Information);
+
+        private void BtnEditAccount_Click(object sender, RoutedEventArgs e)
+            => MessageBox.Show("تعديل الحساب", "إدارة الحساب", MessageBoxButton.OK, MessageBoxImage.Information);
+
+        private void HeaderGrid_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.LeftButton == MouseButtonState.Pressed)
+                DragMove();
+        }
+
+        private void BtnMinimize_Click(object sender, RoutedEventArgs e)
+            => WindowState = WindowState.Minimized;
+
+        private void BtnClose_Click(object sender, RoutedEventArgs e)
+            => Application.Current.Shutdown();
+
+        private void BtnLogout_Click(object sender, RoutedEventArgs e)
+        {
+            new MainWindow().Show();
+            this.Close();
+        }
+
+
+        ////////////////////
+        
+       
     }
 }

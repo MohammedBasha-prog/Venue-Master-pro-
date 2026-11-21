@@ -1,0 +1,359 @@
+﻿<UserControl x:Class="VenueMasterPro.ucRolesManagement"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignHeight="680" d:DesignWidth="1120"
+             FlowDirection="RightToLeft"
+             Loaded="UserControl_Loaded">
+
+    <UserControl.Resources>
+        <!-- ستايل مربعات النصوص -->
+        <Style x:Key="ModernTextBox" TargetType="TextBox">
+            <Setter Property="Height" Value="36"/>
+            <Setter Property="Padding" Value="10,0"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Background" Value="#FFFFFFFF"/>
+            <Setter Property="BorderBrush" Value="#FFCBD5E1"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Template">
+                
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="8">
+                            <ScrollViewer x:Name="PART_ContentHost" Margin="2"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsFocused" Value="True">
+                                <Setter Property="BorderBrush" Value="#FF3B82F6"/>
+                                <Setter Property="BorderThickness" Value="1.5"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- ستايل الزر الأساسي -->
+        <Style x:Key="PrimaryButton" TargetType="Button">
+            <Setter Property="Background" Value="#FF2563EB"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontSize" Value="13.5"/>
+            <Setter Property="Height" Value="40"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="8" Padding="16,0">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#FF1D4ED8"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- ستايل موحد للنصوص داخل الخلايا يبدأ من اليمين -->
+        <Style x:Key="RightCellText" TargetType="TextBlock">
+            <Setter Property="FlowDirection" Value="RightToLeft"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="TextAlignment" Value="Right"/>
+            <Setter Property="Padding" Value="10,0"/>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid Background="Transparent">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- ================= 1. ترويسة الصفحة ================= -->
+        <Border Grid.Row="0" Background="#FFFFFFFF" BorderBrush="#FFE2E8F0" BorderThickness="1" CornerRadius="12" Padding="18,12" Margin="0,0,0,14">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Border Width="40" Height="40" CornerRadius="10" Background="#FFE0F2FE" Margin="0,0,12,0">
+                        <TextBlock Text="🔑" FontSize="19" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock Text="إدارة الأدوار الوظيفية والصلاحيات" FontSize="17" FontWeight="Bold" Foreground="#FF1E3A8A"/>
+                        <TextBlock Text="أنشئ دوراً وظيفياً وحدد صلاحياته من اليمين، أو اختر دوراً من الجدول لتعديله" FontSize="12" Foreground="#FF64748B"/>
+                    </StackPanel>
+                </StackPanel>
+
+                <Border Grid.Column="1" VerticalAlignment="Center" Background="#FFEFF6FF" BorderBrush="#FFBFDBFE" BorderThickness="1" CornerRadius="8" Padding="12,6">
+                    <TextBlock x:Name="lblTotalRolesCount" Text="إجمالي الأدوار: 0" FontSize="12.5" FontWeight="Bold" Foreground="#FF1E40AF"/>
+                </Border>
+            </Grid>
+        </Border>
+
+        <!-- ================= 2. تقسيم الصفحة: يمين مضغوط + يسار واسع للجدول ================= -->
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <!-- النصف الأيمن: بعرض 345 لإعطاء مساحة أكبر للجدول -->
+                <ColumnDefinition Width="345"/>
+                <ColumnDefinition Width="14"/>
+                <!-- النصف الأيسر: جدول الأدوار المسجلة بمساحة واسعة -->
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- ========================================================== -->
+            <!-- القسم الأيمن: بطاقة موحدة لبيانات الدور وتوزيع صلاحياته -->
+            <!-- ========================================================== -->
+            <Border Grid.Column="0" Background="#FFFFFFFF" BorderBrush="#FFE2E8F0" BorderThickness="1" CornerRadius="12" Padding="16">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- عنوان البطاقة ورقم الدور -->
+                    <Grid Grid.Row="0" Margin="0,0,0,12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock x:Name="lblFormTitle" Grid.Column="0" Text="➕ إضافة دور جديد" FontSize="15" FontWeight="Bold" Foreground="#FF1E3A8A" VerticalAlignment="Center"/>
+
+                        <Border Grid.Column="1" Background="#FFF1F5F9" CornerRadius="6" Padding="8,3">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="رقم الدور:" FontSize="11.5" Foreground="#FF64748B" VerticalAlignment="Center"/>
+                                <TextBlock x:Name="lblRoleID" Text="[جديد]" FontSize="11.5" FontWeight="Bold" Foreground="#FF2563EB" Margin="5,0,0,0" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+
+                    <!-- الحقول الأساسية للدور -->
+                    <StackPanel Grid.Row="1" Margin="0,0,0,12">
+                        <TextBlock Text="اسم الدور الوظيفي *" FontSize="12" FontWeight="SemiBold" Foreground="#FF334155" Margin="0,0,0,4"/>
+                        <TextBox x:Name="txtRoleName" Style="{StaticResource ModernTextBox}" Margin="0,0,0,8"/>
+
+                        <TextBlock Text="وصف المهام والمسؤوليات" FontSize="12" FontWeight="SemiBold" Foreground="#FF334155" Margin="0,0,0,4"/>
+                        <TextBox x:Name="txtDescription" Style="{StaticResource ModernTextBox}" Margin="0,0,0,8"/>
+
+                        <CheckBox x:Name="chkIsActive" Content="الدور مفعل ونشط في النظام" IsChecked="True"
+                                  FontSize="12.5" FontWeight="SemiBold" Foreground="#FF334155" Cursor="Hand"/>
+                    </StackPanel>
+
+                    <!-- شريط التحكم بالصلاحيات -->
+                    <Border Grid.Row="2" Background="#FFF8FAFC" BorderBrush="#FFE2E8F0" BorderThickness="1" CornerRadius="8" Padding="8,6" Margin="0,0,0,8">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="6"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="6"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBox x:Name="txtSearchPermissions" Grid.Column="0" Style="{StaticResource ModernTextBox}" Height="30" FontSize="12"
+                                     ToolTip="ابحث باسم الصلاحية أو كودها..."
+                                     TextChanged="TxtSearchPermissions_TextChanged"/>
+
+                            <CheckBox x:Name="chkSelectAllPermissions" Grid.Column="2" Content="الكل" VerticalAlignment="Center"
+                                      FontSize="11.5" FontWeight="Bold" Foreground="#FF1E40AF" Cursor="Hand"
+                                      Click="ChkSelectAllPermissions_Click"/>
+
+                            <Border Grid.Column="4" Background="#FFE0F2FE" CornerRadius="6" Padding="6,3" VerticalAlignment="Center">
+                                <TextBlock x:Name="lblSelectedPermissionsCount" Text="المحددة: 0" FontSize="11" FontWeight="Bold" Foreground="#FF0369A1"/>
+                            </Border>
+                        </Grid>
+                    </Border>
+
+                    <!-- قائمة الصلاحيات المنسدلة -->
+                    <Border Grid.Row="3" BorderBrush="#FFE2E8F0" BorderThickness="1" CornerRadius="10" Background="#FFFAFAFA" Padding="6">
+                        <ListBox x:Name="lstPermissions"
+                                 BorderThickness="0"
+                                 Background="Transparent"
+                                 HorizontalContentAlignment="Stretch"
+                                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                 ScrollViewer.VerticalScrollBarVisibility="Auto">
+                            <ListBox.ItemContainerStyle>
+                                <Style TargetType="ListBoxItem">
+                                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                                    <Setter Property="Padding" Value="0"/>
+                                    <Setter Property="Background" Value="Transparent"/>
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="ListBoxItem">
+                                                <ContentPresenter Margin="0,2"/>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </ListBox.ItemContainerStyle>
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Padding="10,7" CornerRadius="8" Background="White" BorderBrush="#FFE2E8F0" BorderThickness="1">
+                                        <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                  Cursor="Hand" VerticalContentAlignment="Center"
+                                                  Click="PermissionCheckBox_Click">
+                                            <StackPanel Margin="6,0,0,0">
+                                                <TextBlock Text="{Binding PermissionName}" FontSize="12.5" FontWeight="Bold" Foreground="#FF1E293B" TextWrapping="Wrap"/>
+                                                <TextBlock Text="{Binding PermissionCode}" FontSize="11" Foreground="#FF64748B" TextWrapping="Wrap"/>
+                                            </StackPanel>
+                                        </CheckBox>
+                                    </Border>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </Border>
+
+                    <!-- أزرار الحفظ والتفريغ -->
+                    <Grid Grid.Row="4" Margin="0,12,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="8"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Button x:Name="btnSave" Grid.Column="0" Content="💾 حفظ البيانات" Style="{StaticResource PrimaryButton}" Click="BtnSave_Click"/>
+
+                        <Button x:Name="btnClear" Grid.Column="2" Content="🔄 جديد" ToolTip="تفريغ الحقول لإضافة دور جديد" Height="40" Padding="12,0" Cursor="Hand"
+                                FontSize="12.5" FontWeight="SemiBold"
+                                Background="#FFF1F5F9" Foreground="#FF334155" BorderBrush="#FFCBD5E1" BorderThickness="1" Click="BtnClear_Click">
+                            <Button.Resources>
+                                <Style TargetType="Border">
+                                    <Setter Property="CornerRadius" Value="8"/>
+                                </Style>
+                            </Button.Resources>
+                        </Button>
+                    </Grid>
+                </Grid>
+            </Border>
+
+            
+            <!-- ========================================================== -->
+            <!-- القسم الأيسر: جدول الأدوار المسجلة بمساحة واسعة وترتيب RTL -->
+            <!-- ========================================================== -->
+            <Border Grid.Column="2" Background="#FFFFFFFF" BorderBrush="#FFE2E8F0" BorderThickness="1" CornerRadius="12" Padding="18">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- عنوان البطاقة -->
+                    <TextBlock Grid.Row="0" Text="📋 الأدوار الوظيفية المسجلة" FontSize="16" FontWeight="Bold" Foreground="#FF1E3A8A" Margin="0,0,0,12"/>
+
+                    <!-- شريط البحث والفلترة -->
+                    <Grid Grid.Row="1" Margin="0,0,0,12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="12"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBox x:Name="txtSearchRoles" Grid.Column="0" Style="{StaticResource ModernTextBox}" Height="36"
+                                 ToolTip="ابحث باسم الدور أو وصفه..."
+                                 TextChanged="TxtSearchRoles_TextChanged"/>
+
+                        <CheckBox x:Name="chkOnlyActiveRoles" Grid.Column="2" Content="المفعلة فقط" VerticalAlignment="Center"
+                                  FontSize="12.5" FontWeight="SemiBold" Foreground="#FF475569" Cursor="Hand"
+                                  Checked="FilterRoles_Changed" Unchecked="FilterRoles_Changed"/>
+                    </Grid>
+
+                    <!-- جدول الأدوار: محاذاة حقيقية إلى اليمين مع RTL -->
+                    <DataGrid x:Name="dgvRoles" Grid.Row="2"
+          FlowDirection="RightToLeft"
+          AutoGenerateColumns="False"
+          IsReadOnly="True"
+          SelectionMode="Single"
+          SelectionUnit="CellOrRowHeader"
+          KeyboardNavigation.TabNavigation="Continue"
+          KeyboardNavigation.DirectionalNavigation="Contained"
+          CanUserAddRows="False"
+          CanUserResizeColumns="True"
+          HeadersVisibility="Column"
+          GridLinesVisibility="Horizontal"
+          HorizontalGridLinesBrush="#FFE2E8F0"
+          AlternatingRowBackground="#FFF8FAFC"
+          HorizontalScrollBarVisibility="Visible"
+          VerticalScrollBarVisibility="Auto"
+          Background="White"
+          BorderBrush="#FFE2E8F0"
+          BorderThickness="1"
+          RowHeight="42"
+          FontSize="13">
+
+                        <DataGrid.ColumnHeaderStyle>
+                            <Style TargetType="DataGridColumnHeader">
+                                <Setter Property="FlowDirection" Value="RightToLeft"/>
+                                <Setter Property="Background" Value="#FFF8FAFC"/>
+                                <Setter Property="Foreground" Value="#FF1E3A8A"/>
+                                <Setter Property="FontWeight" Value="Bold"/>
+                                <Setter Property="FontSize" Value="13"/>
+                                <Setter Property="Height" Value="40"/>
+                                <Setter Property="Padding" Value="10,0"/>
+                                <Setter Property="HorizontalContentAlignment" Value="Left"/>
+                                <Setter Property="BorderBrush" Value="#FFE2E8F0"/>
+                                <Setter Property="BorderThickness" Value="0,0,1,1"/>
+                            </Style>
+                        </DataGrid.ColumnHeaderStyle>
+
+                        <DataGrid.CellStyle>
+                            <Style TargetType="DataGridCell">
+                                <Setter Property="FlowDirection" Value="RightToLeft"/>
+                                <Setter Property="HorizontalContentAlignment" Value="Left"/>
+                                <Setter Property="VerticalContentAlignment" Value="Center"/>
+                                <Setter Property="BorderThickness" Value="0"/>
+                                <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+                                <Style.Triggers>
+                                    <Trigger Property="IsSelected" Value="True">
+                                        <Setter Property="Background" Value="#FFEFF6FF"/>
+                                        <Setter Property="Foreground" Value="#FF1E3A8A"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </DataGrid.CellStyle>
+
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="#" Binding="{Binding RoleID}" Width="55" ElementStyle="{StaticResource RightCellText}"/>
+                            <DataGridTextColumn Header="اسم الدور" Binding="{Binding RoleName}" Width="160" ElementStyle="{StaticResource RightCellText}"/>
+                            <DataGridTextColumn Header="الصلاحيات" Binding="{Binding PermissionsCount}" Width="95" ElementStyle="{StaticResource RightCellText}"/>
+                            <DataGridTextColumn Header="المستخدمون" Binding="{Binding UsersCount}" Width="100" ElementStyle="{StaticResource RightCellText}"/>
+                            <DataGridTextColumn Header="الحالة" Binding="{Binding StatusText}" Width="90" ElementStyle="{StaticResource RightCellText}"/>
+                            <DataGridTextColumn Header="الوصف" Binding="{Binding Description}" Width="240" ElementStyle="{StaticResource RightCellText}"/>
+
+                            <!-- عمود الإجراءات -->
+                            <DataGridTemplateColumn Header="إجراءات" Width="95">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="8,0,0,0">
+                                            <Button Content="✏️" ToolTip="تعديل الدور وصلاحياته" Background="Transparent" BorderThickness="0" Cursor="Hand" Margin="3,0"
+                                Click="BtnGridEdit_Click"/>
+                                            <Button Content="🗑️" ToolTip="حذف / تعطيل الدور" Background="Transparent" BorderThickness="0" Cursor="Hand" Margin="3,0"
+                                Click="BtnGridDelete_Click"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+
+                </Grid>
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>

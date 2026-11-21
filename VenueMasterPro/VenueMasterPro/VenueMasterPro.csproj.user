@@ -5,6 +5,12 @@
     <Compile Update="Users control\DashboardView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="Users control\ucPermissionsManagement.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Users control\ucRolesManagement.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="Wondwos\MainDashboar.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
