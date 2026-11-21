@@ -39,3 +39,33 @@ GO
 
 
 ----------------------
+
+
+-- roles and rolesPermission tables 
+
+-- 1. Scalar Function ·· Õﬁﬁ „‰ «„ ·«ﬂ «·œÊ— ·’·«ÕÌ… „⁄Ì‰…
+CREATE OR ALTER FUNCTION [dbo].[fn_RoleHasPermission]
+(
+    @RoleID INT,
+    @PermissionCode VARCHAR(100)
+)
+RETURNS BIT
+AS
+BEGIN
+    DECLARE @HasPerm BIT = 0;
+
+    IF EXISTS (
+        SELECT 1
+        FROM [dbo].[RolePermissions] RP
+        INNER JOIN [dbo].[Permissions] P ON RP.PermissionID = P.PermissionID
+        INNER JOIN [dbo].[Roles] R ON RP.RoleID = R.RoleID
+        WHERE RP.RoleID = @RoleID
+          AND P.PermissionCode = @PermissionCode
+          AND P.IsActive = 1
+          AND R.IsActive = 1
+    )
+        SET @HasPerm = 1;
+
+    RETURN @HasPerm;
+END
+GO

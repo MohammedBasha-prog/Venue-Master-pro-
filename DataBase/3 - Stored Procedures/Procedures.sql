@@ -1,97 +1,294 @@
-Create procedure sp_Permissions_Insert 
-   @PermissionName  nvarchar (100) ,
-   @PermissionCode nvarchar(100) ,
-   @Descripation nvarchar(250) ,
-   @IsActive bit =1 ,
-   @NewPermissionID int output 
-   as 
-   begin
-         SET NOCOUNT ON;
-    IF dbo.fn_Permissions_IsExistsForInsert(@PermissionCode, @PermissionName) = 1
-    BEGIN
-        RAISERROR(N'ßæÏ ÇáÕáÇÍíÉ Ãæ ÇáÇÓã ãæÌæÏ ãÓÈÞÇð!', 16, 1);
-        RETURN;
-    END
-
-	insert into Permissions (PermissionName , PermissionCode ,Description,IsActive)
-	values (@PermissionName, @PermissionName ,@Descripation ,@IsActive)
-
-	set @NewPermissionID = SCOPE_IDENTITY();
-end;
-
-go
-
-
--- È. ÅÌÑÇÁ ÇáÊÍÏíË
-CREATE PROCEDURE sp_Permissions_Update
-    @PermissionID INT,
+-- =============================================
+-- 1. ÇáÅÌÑÇÁÇÊ ÇáãÎÒäÉ áÌÏæá Permissions
+-- =============================================
+CREATE OR ALTER PROCEDURE [dbo].[sp_Permissions_Insert]
     @PermissionName NVARCHAR(100),
     @PermissionCode NVARCHAR(100),
-    @Description NVARCHAR(255) = NULL,
-    @IsActive BIT
+    @Description    NVARCHAR(250) = NULL,
+    @IsActive       BIT = 1,
+    @NewPermissionID INT OUTPUT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SET @NewPermissionID = -1;
 
-	as 
-	begin 
-	     set Nocount on ;
-		 IF dbo.fn_Permissions_IsExistsForUpdate(@PermissionID, @PermissionCode, @PermissionName) = 1
-    BEGIN
-        RAISERROR(N'ßæÏ ÇáÕáÇÍíÉ Ãæ ÇáÇÓã ãÓÊÎÏã áÕáÇÍíÉ ÃÎÑì!', 16, 1);
-        RETURN;
-    END
+    BEGIN TRY
+        IF dbo.fn_Permissions_IsExistsForInsert(@PermissionCode, @PermissionName) = 1
+        BEGIN
+            RAISERROR(N'ßæÏ ÇáÕáÇÍíÉ Ãæ ÇáÇÓã ãæÌæÏ ãÓÈÞÇð!', 16, 1);
+            RETURN;
+        END
 
-	update Permissions
-	set PermissionName = @PermissionName ,
-	    PermissionCode = @PermissionCode ,
-		Description = @Description ,
-		IsActive  = @IsActive
-	where PermissionName = @PermissionID ;
-end ;
+        INSERT INTO [dbo].[Permissions] (PermissionName, PermissionCode, Description, IsActive)
+        VALUES (@PermissionName, @PermissionCode, @Description, @IsActive);
 
-go
+        SET @NewPermissionID = SCOPE_IDENTITY();
+    END TRY
+    BEGIN CATCH
+        IF @@TRANCOUNT > 0
+            ROLLBACK TRANSACTION;
+        THROW;
+    END CATCH
+END
+GO
 
+CREATE OR ALTER PROCEDURE [dbo].[sp_Permissions_Update]
+    @PermissionID   INT,
+    @PermissionName NVARCHAR(100),
+    @PermissionCode NVARCHAR(100),
+    @Description    NVARCHAR(250) = NULL,
+    @IsActive       BIT
+AS
+BEGIN
+    SET NOCOUNT ON;
 
--- Ì. ÅÌÑÇÁ ÇáÍÐÝ (Ãæ ÇáÊÚØíá ÇáÂãä)
-CREATE PROCEDURE sp_Permissions_Delete
-     @PermissionID int 
-as 
-begin 
-     set nocount on ;
+    BEGIN TRY
+        IF dbo.fn_Permissions_IsExistsForUpdate(@PermissionID, @PermissionCode, @PermissionName) = 1
+        BEGIN
+            RAISERROR(N'ßæÏ ÇáÕáÇÍíÉ Ãæ ÇáÇÓã ãÓÊÎÏã áÕáÇÍíÉ ÃÎÑì!', 16, 1);
+            RETURN;
+        END
 
-	 if exists (select 1 from RolePermissions where PermissionID = @PermissionID)
-	      update Permissions Set IsActive = 0 where PermissionID = @PermissionID;
-	 else
-	      Delete from Permissions where PermissionID = @PermissionID ;
-end ;
+        UPDATE [dbo].[Permissions]
+        SET PermissionName = @PermissionName,
+            PermissionCode = @PermissionCode,
+            Description    = @Description,
+            IsActive       = @IsActive
+        WHERE PermissionID = @PermissionID;
+    END TRY
+    BEGIN CATCH
+        IF @@TRANCOUNT > 0
+            ROLLBACK TRANSACTION;
+        THROW;
+    END CATCH
+END
+GO
 
+CREATE OR ALTER PROCEDURE [dbo].[sp_Permissions_Delete]
+    @PermissionID INT
+AS
+BEGIN
+    SET NOCOUNT ON;
 
-go
+    BEGIN TRY
+        IF EXISTS (SELECT 1 FROM [dbo].[RolePermissions] WHERE PermissionID = @PermissionID)
+            UPDATE [dbo].[Permissions] SET IsActive = 0 WHERE PermissionID = @PermissionID;
+        ELSE
+            DELETE FROM [dbo].[Permissions] WHERE PermissionID = @PermissionID;
+    END TRY
+    BEGIN CATCH
+        IF @@TRANCOUNT > 0
+            ROLLBACK TRANSACTION;
+        THROW;
+    END CATCH
+END
+GO
 
--- Ï. ÅÌÑÇÁ ÇáÌáÈ ÈÑÞã ÇáÜ ID
-CREATE PROCEDURE sp_Permissions_GetById
-    @PermissionID INT 
-as 
-begin 
-     set nocount on ;
-	 select * from Permissions where PermissionID = @PermissionID;
-end ;
+CREATE OR ALTER PROCEDURE [dbo].[sp_Permissions_GetById]
+    @PermissionID INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SELECT * FROM [dbo].[Permissions] WHERE PermissionID = @PermissionID;
+END
+GO
 
-
-go 
-
---ÌÑÇÁ ãÎÒøä íÌáÈ ÈíÇäÇÊ ÇáÕáÇÍíÇÊ ãä vw_PermissionsDetails ãÚ ÅÎÝÇÁ ÑÓÇÆá ÚÏÏ ÇáÕÝæÝº ÝíÑÌÚ ÇáäÔØÉ ÝÞØ (IsActive = 1)
---ÅÐÇ ßÇä @OnlyActive = 1¡ æÇáÌãíÚ ÇÝÊÑÇÖíÇð (0).
-
--- åÜ. ÅÌÑÇÁ ÌáÈ Çáßá (ãä ÇáÜ View ãÈÇÔÑÉ)
-CREATE PROCEDURE sp_Permissions_GetAll
+CREATE OR ALTER PROCEDURE [dbo].[sp_Permissions_GetAll]
     @OnlyActive BIT = 0
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SELECT *
+    FROM [dbo].[vw_PermissionsDetails]
+    WHERE (@OnlyActive = 0 OR IsActive = 1)
+    ORDER BY PermissionID ASC;
+END
+GO
 
-as 
-begin 
-     set nocount on;
-	 if @OnlyActive = 1 
-	      select * from vw_PermissionsDetails where IsActive = 1;
-		else 
-		  select * from vw_PermissionsDetails ;
-end ;
+-- =============================================
+-- 2. ÇáÅÌÑÇÁÇÊ ÇáãÎÒäÉ áÌÏæá Roles
+-- =============================================
+CREATE OR ALTER PROCEDURE [dbo].[sp_Roles_GetAll]
+    @OnlyActive BIT = 0
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SELECT *
+    FROM [dbo].[vw_RolesDetails]
+    WHERE (@OnlyActive = 0 OR IsActive = 1)
+    ORDER BY RoleID ASC;
+END
+GO
 
-go
+CREATE OR ALTER PROCEDURE [dbo].[sp_Roles_GetById]
+    @RoleID INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SELECT RoleID, RoleName, Description, IsActive
+    FROM [dbo].[Roles]
+    WHERE RoleID = @RoleID;
+END
+GO
+
+CREATE OR ALTER PROCEDURE [dbo].[sp_Roles_Insert]
+    @RoleName    NVARCHAR(100),
+    @Description NVARCHAR(250) = NULL,
+    @IsActive    BIT = 1,
+    @NewRoleID   INT OUTPUT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SET @NewRoleID = -1;
+
+    BEGIN TRY
+        IF EXISTS (SELECT 1 FROM [dbo].[Roles] WHERE RoleName = @RoleName)
+        BEGIN
+            RAISERROR(N'ÇÓã ÇáÏæÑ ÇáæÙíÝí ãÓÌá ãÓÈÞÇð Ýí ÇáäÙÇã.', 16, 1);
+            RETURN;
+        END
+
+        INSERT INTO [dbo].[Roles] (RoleName, Description, IsActive)
+        VALUES (@RoleName, @Description, @IsActive);
+
+        SET @NewRoleID = SCOPE_IDENTITY();
+    END TRY
+    BEGIN CATCH
+        IF @@TRANCOUNT > 0
+            ROLLBACK TRANSACTION;
+        THROW;
+    END CATCH
+END
+GO
+
+CREATE OR ALTER PROCEDURE [dbo].[sp_Roles_Update]
+    @RoleID      INT,
+    @RoleName    NVARCHAR(100),
+    @Description NVARCHAR(250) = NULL,
+    @IsActive    BIT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    BEGIN TRY
+        IF EXISTS (SELECT 1 FROM [dbo].[Roles] WHERE RoleName = @RoleName AND RoleID <> @RoleID)
+        BEGIN
+            RAISERROR(N'ÇÓã ÇáÏæÑ ÇáæÙíÝí ãÓÊÎÏã áÏæÑ ÂÎÑ.', 16, 1);
+            RETURN;
+        END
+
+        UPDATE [dbo].[Roles]
+        SET RoleName    = @RoleName,
+            Description = @Description,
+            IsActive    = @IsActive
+        WHERE RoleID = @RoleID;
+    END TRY
+    BEGIN CATCH
+        IF @@TRANCOUNT > 0
+            ROLLBACK TRANSACTION;
+        THROW;
+    END CATCH
+END
+GO
+
+CREATE OR ALTER PROCEDURE [dbo].[sp_Roles_Delete]
+    @RoleID INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    BEGIN TRY
+        BEGIN TRANSACTION;
+
+        IF EXISTS (SELECT 1 FROM [dbo].[Users] WHERE RoleID = @RoleID)
+        BEGIN
+            ROLLBACK TRANSACTION;
+            SELECT CAST(0 AS INT) AS RowsAffected;
+            RETURN;
+        END
+
+        DELETE FROM [dbo].[RolePermissions] WHERE RoleID = @RoleID;
+
+        DELETE FROM [dbo].[Roles] WHERE RoleID = @RoleID;
+        DECLARE @Affected INT = @@ROWCOUNT;
+
+        COMMIT TRANSACTION;
+
+        SET NOCOUNT OFF;
+        SELECT @Affected AS RowsAffected;
+    END TRY
+    BEGIN CATCH
+        IF @@TRANCOUNT > 0
+            ROLLBACK TRANSACTION;
+        THROW;
+    END CATCH
+END
+GO
+
+-- =============================================
+-- 3. ÇáÅÌÑÇÁÇÊ ÇáãÎÒäÉ áÌÏæá RolePermissions
+-- =============================================
+CREATE OR ALTER PROCEDURE [dbo].[sp_RolePermissions_GetByRoleID]
+    @RoleID INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT 
+        P.PermissionID,
+        P.PermissionName,
+        P.PermissionCode,
+        CAST(CASE WHEN RP.RolePermissionID IS NOT NULL THEN 1 ELSE 0 END AS BIT) AS IsSelected
+    FROM [dbo].[Permissions] P
+    LEFT JOIN [dbo].[RolePermissions] RP 
+        ON P.PermissionID = RP.PermissionID AND RP.RoleID = @RoleID
+    WHERE P.IsActive = 1
+    ORDER BY P.PermissionID ASC;
+END
+GO
+
+CREATE OR ALTER PROCEDURE [dbo].[sp_RolePermissions_SyncForRole]
+    @RoleID        INT,
+    @PermissionIDs NVARCHAR(MAX)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    BEGIN TRY
+        BEGIN TRANSACTION;
+
+        IF @PermissionIDs IS NULL OR LTRIM(RTRIM(@PermissionIDs)) = N''
+        BEGIN
+            DELETE FROM [dbo].[RolePermissions] WHERE RoleID = @RoleID;
+        END
+        ELSE
+        BEGIN
+            DELETE FROM [dbo].[RolePermissions]
+            WHERE RoleID = @RoleID
+              AND PermissionID NOT IN (
+                  SELECT TRY_CAST(LTRIM(RTRIM(value)) AS INT)
+                  FROM STRING_SPLIT(@PermissionIDs, ',')
+                  WHERE TRY_CAST(LTRIM(RTRIM(value)) AS INT) IS NOT NULL
+              );
+
+            INSERT INTO [dbo].[RolePermissions] (RoleID, PermissionID)
+            SELECT DISTINCT @RoleID, TRY_CAST(LTRIM(RTRIM(S.value)) AS INT)
+            FROM STRING_SPLIT(@PermissionIDs, ',') S
+            WHERE TRY_CAST(LTRIM(RTRIM(S.value)) AS INT) IS NOT NULL
+              AND NOT EXISTS (
+                  SELECT 1
+                  FROM [dbo].[RolePermissions] RP
+                  WHERE RP.RoleID = @RoleID
+                    AND RP.PermissionID = TRY_CAST(LTRIM(RTRIM(S.value)) AS INT)
+              );
+        END
+
+        COMMIT TRANSACTION;
+    END TRY
+    BEGIN CATCH
+        IF @@TRANCOUNT > 0
+            ROLLBACK TRANSACTION;
+        THROW;
+    END CATCH
+END
+GO
